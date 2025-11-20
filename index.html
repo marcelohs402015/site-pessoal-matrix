@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marcelo Hernandes | Solution Architect</title>
+    <!-- Fonte estilo Terminal -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matrix-green: #0F0;
+            --matrix-dark-green: #003300;
+            --matrix-bg: #000;
+            --glass-bg: rgba(0, 20, 0, 0.92);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--matrix-bg);
+            color: var(--matrix-green);
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Canvas da Chuva Digital */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Efeito de brilho e borda */
+        .terminal-box {
+            background: var(--glass-bg);
+            border: 1px solid var(--matrix-green);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            padding: 40px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        /* Cabeçalho */
+        header {
+            text-align: center;
+            border-bottom: 2px dashed var(--matrix-dark-green);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--matrix-green);
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            color: #cfc;
+            margin-bottom: 10px;
+        }
+
+        .location {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Títulos de Seção */
+        h2 {
+            font-size: 2rem;
+            color: var(--matrix-bg);
+            background-color: var(--matrix-green);
+            display: inline-block;
+            padding: 0 10px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        /* Texto Geral */
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+            font-size: 1.2rem;
+        }
+
+        /* Grid de Skills */
+        .skills-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .skill-card {
+            border: 1px solid var(--matrix-green);
+            padding: 10px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .skill-card:hover {
+            background: var(--matrix-dark-green);
+            box-shadow: 0 0 10px var(--matrix-green);
+            cursor: crosshair;
+        }
+
+        .skill-title {
+            font-weight: bold;
+            font-size: 1.3rem;
+            border-bottom: 1px solid var(--matrix-dark-green);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* Timeline de Experiência */
+        .job {
+            margin-bottom: 30px;
+            padding-left: 20px;
+            border-left: 3px solid var(--matrix-green);
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .job-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .company {
+            color: var(--matrix-green);
+            font-weight: bold;
+        }
+
+        .date {
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        /* Botão */
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border: 2px solid var(--matrix-green);
+            color: var(--matrix-green);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: transparent;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background: var(--matrix-green);
+            color: black;
+            box-shadow: 0 0 30px var(--matrix-green);
+        }
+
+        /* Cursor piscante */
+        .cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .job-header { flex-direction: column; }
+            .terminal-box { padding: 20px; margin-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix-canvas"></canvas>
+
+    <div class="container">
+        <div class="terminal-box">
+            <header>
+                <h1>Marcelo Hernandes</h1>
+                <div class="subtitle">
+                    Senior Java Developer | Solution Architect | AI Specialist
+                </div>
+                <div class="location">
+                    Sorocaba, SP | >_ SYSTEM.READY <span class="cursor">█</span>
+                </div>
+            </header>
+
+            <!-- RESUMO -->
+            <section>
+                <h2>01. Init_Profile</h2>
+                <p>
+                    Profissional com mais de <strong>25 anos de experiência</strong> em desenvolvimento de software e metodologias ágeis. Atualmente focado em modernização de legado (Java 17 para 21), migração de nuvem (GCP para Equifax Cloud) e segurança da informação.
+                </p>
+                <p>
+                    Especialista em integração de <strong>IA Generativa e Model Context Protocol (MCP)</strong>, desenvolvendo ferramentas que reduzem o overhead de engenharia através de automação inteligente. Minha missão é entregar soluções de alta performance, seguras e escaláveis.
+                </p>
+            </section>
+
+            <!-- SKILLS -->
+            <section>
+                <h2>02. Tech_Stack</h2>
+                <div class="skills-wrapper">
+                    <div class="skill-card">
+                        <span class="skill-title">Backend Core</span>
+                        Java 21, Spring Boot, Node.js, TypeScript
+                    </div>
+                    <div class="skill-card">
+                        <span class="skill-title">Cloud & DevOps</span>
+                        AWS, GCP, Docker, Kubernetes, Jenkins, CI/CD
+                    </div>
+                    <div class="skill-card">
+                        <span class="skill-title">Architecture</span>
+                        Microservices, RESTful APIs, EDA (Kafka/Camel)
+                    </div>
+                    <div class="skill-card">
+                        <span class="skill-title">Security & AI</span>
+                        DevSecOps (Sonar/Fortify), OAuth2, GenAI, MCP
+                    </div>
+                </div>
+            </section>
+
+            <!-- EXPERIÊNCIA -->
+            <section>
+                <h2>03. Execution_Log</h2>
+                
+                <!-- Job 1 -->
+                <div class="job">
+                    <div class="job-header">
+                        <span class="job-title">Java Senior Developer Backend</span>
+                        <span class="date">Mar 2025 - Presente</span>
+                    </div>
+                    <div class="company">Foursys | São Paulo</div>
+                    <p>Desenvolvimento de microsserviços e migração de sistemas legados do GCP. Atualização de stack Java 17 para 21, criptografia de dados com biblioteca Barricade e implementação de pipelines seguros (Jenkins, Sonar, Fortify).</p>
+                </div>
+
+                <!-- Job 2 -->
+                <div class="job">
+                    <div class="job-header">
+                        <span class="job-title">Senior Java Developer</span>
+                        <span class="date">Set 2023 - Mar 2025</span>
+                    </div>
+                    <div class="company">NAVA - Technology for Business</div>
+                    <p>Atuação no Squad de Meios de Pagamento. Construção de APIs (BaaS) com Spring Boot e integração via Camel Gateway. Uso de bancos Oracle e NoSQL (MongoDB/Redis) em arquitetura distribuída na AWS (EKS).</p>
+                </div>
+
+                <!-- Job 3 -->
+                <div class="job">
+                    <div class="job-header">
+                        <span class="job-title">Application Developer (DevSecOps)</span>
+                        <span class="date">Mai 2023 - Ago 2023</span>
+                    </div>
+                    <div class="company">Start Security</div>
+                    <p>Implementação de pipeline DevSecOps automatizando verificações de segurança (SAST/DAST) com scripts YAML, garantindo conformidade com OWASP Top 10.</p>
+                </div>
+
+                <!-- Job 4 -->
+                <div class="job">
+                    <div class="job-header">
+                        <span class="job-title">Senior Software Developer</span>
+                        <span class="date">Nov 2019 - Mar 2023</span>
+                    </div>
+                    <div class="company">Avanade (Projeto Santander)</div>
+                    <p>Integração de sistemas legados usando Arsenal Spring Boot e Camel como orquestrador. Tecnologias: Java 8/11, JPA, Hibernate, Kafka e TDD.</p>
+                </div>
+
+                <div style="text-align: center; opacity: 0.7; margin-top: 10px;">
+                    [... Carregando histórico anterior: Edesoft, Decision Group, ITC Treasury, Atias Mihael ...]
+                </div>
+            </section>
+
+            <!-- EDUCAÇÃO -->
+            <section>
+                <h2>04. Knowledge_Base</h2>
+                <ul style="list-style: none;">
+                    <li style="margin-bottom: 10px;">
+                        <strong>MBA in Solution Architecture</strong> - Full Cycle (2024 - 2025)
+                    </li>
+                    <li>
+                        <strong>Gestão de Tecnologia da Informação</strong> - Uninove (2018 - 2021)
+                    </li>
+                </ul>
+            </section>
+
+            <!-- CONTATO -->
+            <section class="btn-container">
+                <p>Deseja estabelecer uma conexão segura?</p>
+                <a href="https://www.linkedin.com/in/marcelo-hernandes-351a7159/" target="_blank" class="btn">
+                    Acessar LinkedIn
+                </a>
+                <br><br>
+                <small>marcelohs40@gmail.com | +55 15 99262-5754</small>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Efeito Matrix
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ajusta tamanho do canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Caracteres para a chuva (Katakana + Latin + Numbers)
+        const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const charArray = chars.split('');
+
+        const fontSize = 16;
+        let columns = canvas.width / fontSize;
+        
+        // Array para guardar a posição Y de cada coluna
+        let drops = [];
+        for(let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            // Fundo preto com opacidade muito baixa para criar o rastro
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0'; // Cor do texto (Verde Matrix)
+            ctx.font = fontSize + 'px monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                // Reseta a gota para o topo aleatoriamente
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+    </script>
+</body>
+</html>
